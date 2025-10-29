@@ -15,14 +15,14 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
 fi
 
 # Pelican-specific fixes (enable with Pelican_fix=true/True/1)
-if [[ "${Pelican_fix:-}" == "true" || "${Pelican_fix:-}" == "True" || "${Pelican_fix:-}" == "1" ]]; then
-    echo "[Pelican_fix] enabled" >&2
-    export HOME=/mnt/server
-    mkdir -p /mnt/server/steamapps
-    chown -R root:root /mnt || true
-    echo "HOME=${HOME}" >&2
-    echo "STEAMCMDDIR=${STEAMCMDDIR:-unset}" >&2
-    echo "STEAMAPPDIR=${STEAMAPPDIR:-unset}" >&2
+if [[ "${Pelican_fix,,}" == "true" || "${Pelican_fix}" == "1" ]]; then
+  echo "Pelican_fix is running..."
+  export HOME=/mnt/server
+  mkdir -p /mnt/server/steamapps
+  chown -R root:root /mnt || true
+  echo "[Pelican_fix] HOME=${HOME}"
+  echo "[Pelican_fix] STEAMAPPDIR=${STEAMAPPDIR:-<unset>}"
+  echo "[Pelican_fix] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
 fi
 
 # Create App Dir
