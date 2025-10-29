@@ -17,7 +17,7 @@ fi
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   # Point runtime to the already-installed tree
-  STEAMAPPDIR="/mnt/server"
+  STEAMAPPDIR="/home/container"
   export STEAMAPPDIR
   export HOME="$STEAMAPPDIR"
 
