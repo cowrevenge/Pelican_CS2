@@ -14,6 +14,16 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
     CS2_LOG_ITEMS=1
 fi
 
+# Normalize paths and HOME for Pelican and non-Pelican
+: "${STEAMAPPDIR:=/mnt/server}"
+STEAMAPPDIR="${STEAMAPPDIR%/}"   # strip trailing slash to avoid //
+: "${HOME:=${STEAMAPPDIR}}"
+export XDG_RUNTIME_DIR="${HOME}"
+export TMPDIR="${HOME}"
+
+# Preflight: Steam expects these under $HOME
+mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
+
 # Create App Dir
 mkdir -p "${STEAMAPPDIR}" || true
 
@@ -51,13 +61,13 @@ if [[ $steamcmd_rc != 0 ]]; then
     exit $steamcmd_rc
 fi
 
-# FIX: steamclient.so fix
-mkdir -p ~/.steam/sdk64
-ln -sfT ${STEAMCMDDIR}/linux64/steamclient.so ~/.steam/sdk64/steamclient.so
+# FIX: steamclient.so fix (under $HOME)
+mkdir -p "${HOME}/.steam/sdk64"
+ln -sfT "${STEAMCMDDIR}/linux64/steamclient.so" "${HOME}/.steam/sdk64/steamclient.so"
 
 # Install server.cfg
-mkdir -p $STEAMAPPDIR/game/csgo/cfg
-cp /etc/server.cfg "${STEAMAPPDIR}"/game/csgo/cfg/server.cfg
+mkdir -p "${STEAMAPPDIR}/game/csgo/cfg"
+cp /etc/server.cfg "${STEAMAPPDIR}/game/csgo/cfg/server.cfg"
 
 # Install hooks if they don't already exist
 if [[ ! -f "${STEAMAPPDIR}/pre.sh" ]] ; then
@@ -116,20 +126,20 @@ sed -i -e "s/{{SERVER_HOSTNAME}}/${CS2_SERVERNAME}/g" \
        -e "s/{{SERVER_LOG_MONEY}}/${CS2_LOG_MONEY}/g" \
        -e "s/{{SERVER_LOG_DETAIL}}/${CS2_LOG_DETAIL}/g" \
        -e "s/{{SERVER_LOG_ITEMS}}/${CS2_LOG_ITEMS}/g" \
-       "${STEAMAPPDIR}"/game/csgo/cfg/server.cfg
+       "${STEAMAPPDIR}/game/csgo/cfg/server.cfg"
 
 if [[ ! -z $CS2_BOT_DIFFICULTY ]] ; then
-    sed -i "s/bot_difficulty.*/bot_difficulty ${CS2_BOT_DIFFICULTY}/" "${STEAMAPPDIR}"/game/csgo/cfg/*
+    sed -i "s/bot_difficulty.*/bot_difficulty ${CS2_BOT_DIFFICULTY}/" "${STEAMAPPDIR}/game/csgo/cfg/"*
 fi
 if [[ ! -z $CS2_BOT_QUOTA ]] ; then
-    sed -ri "s/bot_quota[[:space:]]+.*/bot_quota ${CS2_BOT_QUOTA}/" "${STEAMAPPDIR}"/game/csgo/cfg/*
+    sed -ri "s/bot_quota[[:space:]]+.*/bot_quota ${CS2_BOT_QUOTA}/" "${STEAMAPPDIR}/game/csgo/cfg/"*
 fi
 if [[ ! -z $CS2_BOT_QUOTA_MODE ]] ; then
-    sed -i "s/bot_quota_mode.*/bot_quota_mode ${CS2_BOT_QUOTA_MODE}/" "${STEAMAPPDIR}"/game/csgo/cfg/*
+    sed -i "s/bot_quota_mode.*/bot_quota_mode ${CS2_BOT_QUOTA_MODE}/" "${STEAMAPPDIR}/game/csgo/cfg/"*
 fi
 
 # Switch to server directory
-cd "${STEAMAPPDIR}/game/"
+cd "${STEAMAPPDIR}/game"
 
 # Pre Hook
 source "${STEAMAPPDIR}/pre.sh"
