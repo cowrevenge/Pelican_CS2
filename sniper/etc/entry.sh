@@ -16,24 +16,33 @@ fi
 
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
-  # override image default unconditionally
-  STEAMAPPDIR="/mnt/server/cs2-dedicated"
+  # Point runtime to the already-installed tree
+  STEAMAPPDIR="/mnt/server"
   export STEAMAPPDIR
   export HOME="$STEAMAPPDIR"
 
-  echo "Pelicanfix is running..."
+  echo "Pelicanfix enabled"
   echo "[PELICANFIX] HOME=$HOME"
   echo "[PELICANFIX] STEAMAPPDIR=$STEAMAPPDIR"
-  echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
-  echo "$EUID"
-  id
-  ls -ld / /home /mnt /mnt/server /mnt/server/steam
-  touch /mnt/server/testfile && rm /mnt/server/testfile
+  echo "[PELICANFIX] uid=$(id -u) gid=$(id -g)"
 
-  mkdir -p "${STEAMAPPDIR}"
+  # Sanity checks only
+  [ -d "$STEAMAPPDIR" ] || { echo "[PELICANFIX] ERROR: $STEAMAPPDIR missing"; exit 1; }
+  [ -w "$STEAMAPPDIR" ] || { 
+    echo "[PELICANFIX] ERROR: $STEAMAPPDIR not writable"
+    ls -ld "$STEAMAPPDIR"
+    exit 1
+  }
 
-  mkdir -p "$HOME/steamapps" "$HOME/.steam/sdk32" "$HOME/.steam/sdk64" "$HOME/Steam/logs"
-  exec 2> "$HOME/Steam/logs/stderr.txt"
+  cd "$STEAMAPPDIR"
+
+  # Redirect stderr only if logs path already exists
+  if [ -d "$HOME/Steam/logs" ]; then
+    exec 2> "$HOME/Steam/logs/stderr.txt"
+    echo "[PELICANFIX] stderr -> $HOME/Steam/logs/stderr.txt"
+  else
+    echo "[PELICANFIX] skip stderr redirect; $HOME/Steam/logs not present"
+  fi
 fi
 
 # Download Updates
