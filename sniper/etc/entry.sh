@@ -16,13 +16,18 @@ fi
 
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
-  : "${STEAMAPPDIR:=/mnt/server/cs2-dedicated}"
-  export HOME="${STEAMAPPDIR}"
+  # override image default unconditionally
+  STEAMAPPDIR="/mnt/server/cs2-dedicated"
+  export STEAMAPPDIR
+  export HOME="$STEAMAPPDIR"
+
   echo "Pelicanfix is running..."
-  echo "[PELICANFIX] HOME=${HOME}"
-  echo "[PELICANFIX] STEAMAPPDIR=${STEAMAPPDIR}"
+  echo "[PELICANFIX] HOME=$HOME"
+  echo "[PELICANFIX] STEAMAPPDIR=$STEAMAPPDIR"
   echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
-  mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
+
+  mkdir -p "$HOME/steamapps" "$HOME/.steam/sdk32" "$HOME/.steam/sdk64" "$HOME/Steam/logs"
+  exec 2> "$HOME/Steam/logs/stderr.txt"
 fi
 
 # Create App Dir (HOME-safe bootstrap even if PELICANFIX is off)
