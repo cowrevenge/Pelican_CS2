@@ -25,6 +25,7 @@ if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   echo "[PELICANFIX] HOME=$HOME"
   echo "[PELICANFIX] STEAMAPPDIR=$STEAMAPPDIR"
   echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
+  echo "$EUID"
   
   mkdir -p "${STEAMAPPDIR}"
 
