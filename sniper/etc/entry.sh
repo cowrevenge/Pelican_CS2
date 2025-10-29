@@ -15,7 +15,7 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
 fi
 
 # Pelican-specific fixes (enable with PELICANFIX=true,1)
-if [[ "${PELICANFIX}" == "true" || "${PELICANFIX}" == "1" ]]; then
+if [[ "$PELICANFIX" =~ ^(1|true|True)$ ]]; then
   echo "Pelicanfix is running..."
   export HOME=/mnt/server
   mkdir -p /mnt/server/steamapps
@@ -25,6 +25,7 @@ if [[ "${PELICANFIX}" == "true" || "${PELICANFIX}" == "1" ]]; then
   echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
 fi
 
+echo "Chicken Go cluck cluck"
 # Create App Dir
 mkdir -p "${STEAMAPPDIR}" || true
 
