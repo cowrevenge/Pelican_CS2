@@ -14,20 +14,22 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
     CS2_LOG_ITEMS=1
 fi
 
-# Pelican-specific fixes (enable with PELICANFIX=true,1)
-if [[ "$PELICANFIX" =~ ^(1|true|True)$ ]]; then
+# Pelican-specific fixes (enable with PELICANFIX=1|true|True)
+if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
+  : "${STEAMAPPDIR:=/home/steam/cs2-dedicated}"
+  export HOME="${STEAMAPPDIR}"
   echo "Pelicanfix is running..."
-  export HOME=/mnt/server
-  mkdir -p /mnt/server/steamapps
-  chown -R root:root /mnt || true
   echo "[PELICANFIX] HOME=${HOME}"
-  echo "[PELICANFIX] STEAMAPPDIR=${STEAMAPPDIR:-<unset>}"
+  echo "[PELICANFIX] STEAMAPPDIR=${STEAMAPPDIR}"
   echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
+  mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
 fi
 
-echo "Chicken Go cluck cluck"
-# Create App Dir
-mkdir -p "${STEAMAPPDIR}" || true
+# Create App Dir (HOME-safe bootstrap even if PELICANFIX is off)
+: "${STEAMAPPDIR:=/home/steam/cs2-dedicated}"
+: "${HOME:=${STEAMAPPDIR}}"
+mkdir -p "${STEAMAPPDIR}"
+mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
 
 # Download Updates
 if [[ "$STEAMAPPVALIDATE" -eq 1 ]]; then
@@ -63,13 +65,13 @@ if [[ $steamcmd_rc != 0 ]]; then
     exit $steamcmd_rc
 fi
 
-# FIX: steamclient.so fix
-mkdir -p ~/.steam/sdk64
-ln -sfT ${STEAMCMDDIR}/linux64/steamclient.so ~/.steam/sdk64/steamclient.so
+# FIX: steamclient.so fix (HOME-safe)
+mkdir -p "${HOME}/.steam/sdk64"
+ln -sfT "${STEAMCMDDIR}/linux64/steamclient.so" "${HOME}/.steam/sdk64/steamclient.so"
 
-# Install server.cfg
-mkdir -p $STEAMAPPDIR/game/csgo/cfg
-cp /etc/server.cfg "${STEAMAPPDIR}"/game/csgo/cfg/server.cfg
+# Install server.cfg (HOME/STEAMAPPDIR-safe)
+mkdir -p "${STEAMAPPDIR}/game/csgo/cfg"
+cp /etc/server.cfg "${STEAMAPPDIR}/game/csgo/cfg/server.cfg"
 
 # Install hooks if they don't already exist
 if [[ ! -f "${STEAMAPPDIR}/pre.sh" ]] ; then
