@@ -14,15 +14,15 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
     CS2_LOG_ITEMS=1
 fi
 
-# Pelican-specific fixes (enable with Pelican_fix=true/True/1)
-if [[ "${Pelican_fix,,}" == "true" || "${Pelican_fix}" == "1" ]]; then
-  echo "Pelican_fix is running..."
+# Pelican-specific fixes (enable with PELICANFIX=true,1)
+if [[ "${PELICANFIX}" == "true" || "${PELICANFIX}" == "1" ]]; then
+  echo "Pelicanfix is running..."
   export HOME=/mnt/server
   mkdir -p /mnt/server/steamapps
   chown -R root:root /mnt || true
-  echo "[Pelican_fix] HOME=${HOME}"
-  echo "[Pelican_fix] STEAMAPPDIR=${STEAMAPPDIR:-<unset>}"
-  echo "[Pelican_fix] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
+  echo "[PELICANFIX] HOME=${HOME}"
+  echo "[PELICANFIX] STEAMAPPDIR=${STEAMAPPDIR:-<unset>}"
+  echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
 fi
 
 # Create App Dir
