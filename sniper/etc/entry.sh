@@ -14,14 +14,6 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
     CS2_LOG_ITEMS=1
 fi
 
-# Elevation shim: if running as root, fix mount perms then re-exec as steam
-if [ "$(id -u)" = "0" ] && [ -z "${LAUNCHED_AS_STEAM:-}" ]; then
-  mkdir -p /mnt/server
-  chown -R 1000:1000 /mnt/server || true
-  export LAUNCHED_AS_STEAM=1
-  exec runuser -u steam -- "$0" "$@"
-fi
-
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   # override image default unconditionally
@@ -33,16 +25,12 @@ if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   echo "[PELICANFIX] HOME=$HOME"
   echo "[PELICANFIX] STEAMAPPDIR=$STEAMAPPDIR"
   echo "[PELICANFIX] STEAMCMDDIR=${STEAMCMDDIR:-<unset>}"
+  
+  mkdir -p "${STEAMAPPDIR}"
 
   mkdir -p "$HOME/steamapps" "$HOME/.steam/sdk32" "$HOME/.steam/sdk64" "$HOME/Steam/logs"
   exec 2> "$HOME/Steam/logs/stderr.txt"
 fi
-
-# Create App Dir (HOME-safe bootstrap even if PELICANFIX is off)
-: "${STEAMAPPDIR:=/mnt/server/cs2-dedicated}"
-: "${HOME:=${STEAMAPPDIR}}"
-mkdir -p "${STEAMAPPDIR}"
-mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
 
 # Download Updates
 if [[ "$STEAMAPPVALIDATE" -eq 1 ]]; then
