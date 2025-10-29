@@ -16,7 +16,7 @@ fi
 
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
-  : "${STEAMAPPDIR:=/home/steam/cs2-dedicated}"
+  : "${STEAMAPPDIR:=/mnt/server/cs2-dedicated}"
   export HOME="${STEAMAPPDIR}"
   echo "Pelicanfix is running..."
   echo "[PELICANFIX] HOME=${HOME}"
