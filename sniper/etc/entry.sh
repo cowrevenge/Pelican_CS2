@@ -14,6 +14,14 @@ if [[ $DEBUG -eq 2 ]] || [[ $DEBUG -eq 3 ]]; then
     CS2_LOG_ITEMS=1
 fi
 
+# Elevation shim: if running as root, fix mount perms then re-exec as steam
+if [ "$(id -u)" = "0" ] && [ -z "${LAUNCHED_AS_STEAM:-}" ]; then
+  mkdir -p /mnt/server
+  chown -R 1000:1000 /mnt/server || true
+  export LAUNCHED_AS_STEAM=1
+  exec runuser -u steam -- "$0" "$@"
+fi
+
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   # override image default unconditionally
