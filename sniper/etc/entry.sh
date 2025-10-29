@@ -26,7 +26,7 @@ if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
 fi
 
 # Create App Dir (HOME-safe bootstrap even if PELICANFIX is off)
-: "${STEAMAPPDIR:=/home/steam/cs2-dedicated}"
+: "${STEAMAPPDIR:=/mnt/server/cs2-dedicated}"
 : "${HOME:=${STEAMAPPDIR}}"
 mkdir -p "${STEAMAPPDIR}"
 mkdir -p "${HOME}/steamapps" "${HOME}/.steam/sdk32" "${HOME}/.steam/sdk64"
