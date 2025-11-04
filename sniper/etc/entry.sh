@@ -16,34 +16,32 @@ fi
 
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
-  # Point runtime to the already-installed tree
-  STEAMAPPDIR="/home/container"
-  export STEAMAPPDIR
-  export HOME="$STEAMAPPDIR"
+  # Canonical runtime under /home/steam/Steam/cs2-dedicated (no /home/container)
+  export HOME="/home/steam"
+  export STEAMAPPDIR="${HOME}/Steam"
+  INSTALL_DIR="${STEAMAPPDIR}/cs2-dedicated"
 
   echo "Pelicanfix enabled"
-  echo "[PELICANFIX] HOME=$HOME"
-  echo "[PELICANFIX] STEAMAPPDIR=$STEAMAPPDIR"
+  echo "[PELICANFIX] HOME=${HOME}"
+  echo "[PELICANFIX] STEAMAPPDIR=${STEAMAPPDIR}"
+  echo "[PELICANFIX] INSTALL_DIR=${INSTALL_DIR}"
   echo "[PELICANFIX] uid=$(id -u) gid=$(id -g)"
 
-  # Sanity checks only
-  [ -d "$STEAMAPPDIR" ] || { echo "[PELICANFIX] ERROR: $STEAMAPPDIR missing"; exit 1; }
-  [ -w "$STEAMAPPDIR" ] || { 
-    echo "[PELICANFIX] ERROR: $STEAMAPPDIR not writable"
-    ls -ld "$STEAMAPPDIR"
-    exit 1
-  }
+  # Sanity + minimal scaffolding
+  mkdir -p "${INSTALL_DIR}" "${STEAMAPPDIR}/logs" || {
+    echo "[PELICANFIX] ERROR: creating ${INSTALL_DIR} or logs failed"; exit 1; }
 
-  cd "$STEAMAPPDIR"
+  [ -w "${INSTALL_DIR}" ] || {
+    echo "[PELICANFIX] ERROR: ${INSTALL_DIR} not writable"; ls -ld "${INSTALL_DIR}"; exit 1; }
 
-  # Redirect stderr only if logs path already exists
-  if [ -d "$HOME/Steam/logs" ]; then
-    exec 2> "$HOME/Steam/logs/stderr.txt"
-    echo "[PELICANFIX] stderr -> $HOME/Steam/logs/stderr.txt"
-  else
-    echo "[PELICANFIX] skip stderr redirect; $HOME/Steam/logs not present"
-  fi
+  # Run from the install dir expected by the wrapper
+  cd "${INSTALL_DIR}"
+
+  # Redirect stderr to Steam logs
+  exec 2> "${STEAMAPPDIR}/logs/stderr.txt"
+  echo "[PELICANFIX] stderr -> ${STEAMAPPDIR}/logs/stderr.txt"
 fi
+
 
 # Download Updates
 if [[ "$STEAMAPPVALIDATE" -eq 1 ]]; then
