@@ -17,7 +17,7 @@ fi
 # Pelican-specific fixes (enable with PELICANFIX=1|true|True)
 if [[ "${PELICANFIX}" =~ ^(1|true|True)$ ]]; then
   # Canonical runtime under /home/steam/Steam/cs2-dedicated (no /home/container)
-  export HOME="/home/steam"
+  export HOME="/home/container"
   export STEAMAPPDIR="${HOME}/Steam"
   INSTALL_DIR="${STEAMAPPDIR}/cs2-dedicated"
 
